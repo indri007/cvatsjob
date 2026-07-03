@@ -66,8 +66,34 @@ class DatabaseManager:
 
     def __init__(self, db_url: Optional[str] = None):
         self.db_url = db_url or config.DATABASE_URL
-        self.engine = create_engine(self.db_url, echo=False)
+
+        if self.db_url.startswith("mysql"):
+            # Ensure pymysql driver is used
+            if not self.db_url.startswith("mysql+pymysql://"):
+                self.db_url = self.db_url.replace("mysql://", "mysql+pymysql://")
+
+            # Remove query parameters (like ?ssl-mode=REQUIRED or ?ssl_ca=...)
+            if "?" in self.db_url:
+                self.db_url = self.db_url.split("?")[0]
+
+            # Use SSL with ca.pem if available (local / Cloud Run),
+            # otherwise connect without SSL cert (Streamlit Cloud)
+            import os
+            ca_paths = ["aiven/ca.pem", "ca.pem", "data/ca.pem"]
+            ca_path = next((p for p in ca_paths if os.path.exists(p)), None)
+
+            if ca_path:
+                ssl_args = {"ssl": {"ssl_ca": ca_path}}
+            else:
+                # Streamlit Cloud — no local ca.pem, use SSL without cert verification
+                ssl_args = {"ssl": {"ssl_disabled": False}}
+
+            self.engine = create_engine(self.db_url, connect_args=ssl_args, echo=False)
+        else:
+            self.engine = create_engine(self.db_url, echo=False)
+
         self.Session = sessionmaker(bind=self.engine)
+
 
     def create_tables(self):
         """Create all tables."""
