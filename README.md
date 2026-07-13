@@ -1,7 +1,7 @@
 # 🎯 JobMatch AI — CV Review & Job Recommendation App
 
 AI-powered web application untuk membantu pencarian kerja di Indonesia.
-Upload CV kamu dan dapatkan rekomendasi lowongan, review CV, konsultasi karir, dan mock interview berbasis AI.
+Upload CV kamu dan dapatkan rekomendasi lowongan, review CV, konsultasi karir, dan mock interview ini berbasis AI.
 
 ## 🌐 Live Demo
 
