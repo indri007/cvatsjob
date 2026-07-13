@@ -7,10 +7,14 @@ A. Input CV → B. Lowongan Kerja → C. Review CV → D. Konsultasi Karir → E
 """
 
 import streamlit as st
+import auth_setup
+auth_setup.require_google_login()
+auth_setup.show_user_badge_and_logout(location="sidebar")
 import urllib.parse
 from pathlib import Path
 
 import config
+from customer_service_chat_floating import render_cs_chatbot
 from cv_processor import extract_cv_text, get_file_info, validate_cv_file
 from database import DatabaseManager
 from vector_store import VectorStoreManager
@@ -20,8 +24,21 @@ st.set_page_config(
     page_title="JobMatch AI — CV Review & Job Recommendations",
     page_icon="🎯",
     layout="wide",
-    initial_sidebar_state="expanded",
+ initial_sidebar_state="expanded",
 )
+
+# ─── Google Auth Check ─────────────────────────────────────
+if not st.user.is_logged_in:
+    st.title("🎯 JobMatch AI")
+    st.write("Silakan login dengan akun Google untuk melanjutkan.")
+    if st.button("Login dengan Google"):
+        st.login()
+    st.stop()
+
+st.sidebar.write(f"👋 Halo, {st.user.name}")
+st.sidebar.write(f"📧 {st.user.email}")
+if st.sidebar.button("Logout"):
+    st.logout()
 
 # ─── Load CSS ─────────────────────────────────────────────
 css_path = Path(__file__).parent / "styles.css"
@@ -228,6 +245,12 @@ if st.session_state.current_step == 0:
 
         if uploaded_file is not None:
             file_bytes = uploaded_file.getvalue()
+
+            # Validate size
+            max_bytes = config.MAX_UPLOAD_SIZE_MB * 1024 * 1024
+            if len(file_bytes) > max_bytes:
+                st.error(f"❌ File terlalu besar. Maksimum {config.MAX_UPLOAD_SIZE_MB}MB.")
+                st.stop()
 
             # Validate
             is_valid, error_msg = validate_cv_file(file_bytes, uploaded_file.name)
@@ -977,3 +1000,4 @@ elif st.session_state.current_step == 4:
             </div>""",
             unsafe_allow_html=True,
         )
+render_cs_chatbot()
