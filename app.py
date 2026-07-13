@@ -32,6 +32,24 @@ from pages.step_c_review import render_step_c
 from pages.step_d_consultation import render_step_d
 from pages.step_e_interview import render_step_e
 
+import os
+import sentry_sdk
+from health_server import start_health_server
+
+# ─── Observability: Sentry + health check server ──────────
+sentry_dsn = os.getenv("SENTRY_DSN")
+if sentry_dsn:
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        environment=os.getenv("ENVIRONMENT", "development"),
+        traces_sample_rate=0.1,
+    )
+
+if "_health_server_started" not in st.session_state:
+    start_health_server()
+    st.session_state["_health_server_started"] = True
+
+
 # ─── Page Config ──────────────────────────────────────────
 st.set_page_config(
     page_title="JobMatch AI — CV Review & Job Recommendations",
