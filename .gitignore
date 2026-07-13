@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 data/jobs.db
 data/chroma_db/
+.streamlit/secrets.toml
