@@ -5,3 +5,7 @@ __pycache__/
 data/jobs.db
 data/chroma_db/
 .streamlit/secrets.toml
+*.bak_before_refactor
+*.bak_before_upload
+*.b64
+setup_observability.sh
