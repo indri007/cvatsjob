@@ -40,18 +40,15 @@ def parse_salary(salary_str: str) -> tuple[Optional[float], Optional[float]]:
     if not salary_str or salary_str == "None":
         return None, None
 
-    # Find all numbers in the string (handle dot-separated thousands)
     numbers = re.findall(r'[\d]+(?:\.[\d]+)*', salary_str)
     parsed = []
     for num_str in numbers:
-        # Remove dots used as thousand separators
         clean = num_str.replace(".", "")
         try:
             parsed.append(float(clean))
         except ValueError:
             continue
 
-    # Filter out very small numbers (likely not salary)
     parsed = [n for n in parsed if n >= 100000]
 
     if len(parsed) >= 2:
@@ -64,20 +61,21 @@ def parse_salary(salary_str: str) -> tuple[Optional[float], Optional[float]]:
 class DatabaseManager:
     """Manages SQLite/MySQL database connections and queries."""
 
+    _FORBIDDEN_SQL = re.compile(
+        r"\b(INSERT|UPDATE|DELETE|DROP|ALTER|TRUNCATE|GRANT|REVOKE|CREATE)\b|;|--",
+        re.IGNORECASE,
+    )
+
     def __init__(self, db_url: Optional[str] = None):
         self.db_url = db_url or config.DATABASE_URL
 
         if self.db_url.startswith("mysql"):
-            # Ensure pymysql driver is used
             if not self.db_url.startswith("mysql+pymysql://"):
                 self.db_url = self.db_url.replace("mysql://", "mysql+pymysql://")
 
-            # Remove query parameters (like ?ssl-mode=REQUIRED or ?ssl_ca=...)
             if "?" in self.db_url:
                 self.db_url = self.db_url.split("?")[0]
 
-            # Use SSL with ca.pem if available (local / Cloud Run),
-            # otherwise connect without SSL cert (Streamlit Cloud)
             import os
             ca_paths = ["aiven/ca.pem", "ca.pem", "data/ca.pem"]
             ca_path = next((p for p in ca_paths if os.path.exists(p)), None)
@@ -85,7 +83,6 @@ class DatabaseManager:
             if ca_path:
                 ssl_args = {"ssl": {"ssl_ca": ca_path}}
             else:
-                # Streamlit Cloud — no local ca.pem, use SSL without cert verification
                 ssl_args = {"ssl": {"ssl_disabled": False}}
 
             self.engine = create_engine(self.db_url, connect_args=ssl_args, echo=False)
@@ -220,6 +217,11 @@ class DatabaseManager:
 
     def execute_raw_sql(self, query_str: str) -> list[dict]:
         """Execute a raw SQL query and return results as dicts. For SQL Agent."""
+        if not query_str.strip().upper().startswith("SELECT"):
+            return [{"error": "Hanya query SELECT yang diizinkan."}]
+        if self._FORBIDDEN_SQL.search(query_str):
+            return [{"error": "Query mengandung keyword yang tidak diizinkan."}]
+
         session = self.Session()
         try:
             result = session.execute(sql_text(query_str))
@@ -227,7 +229,8 @@ class DatabaseManager:
             rows = result.fetchall()
             return [dict(zip(columns, row)) for row in rows]
         except Exception as e:
-            return [{"error": str(e)}]
+            print(f"SQL execution failed: {e}")
+            return [{"error": "Terjadi kesalahan saat menjalankan query."}]
         finally:
             session.close()
 
