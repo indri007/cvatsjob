@@ -93,10 +93,23 @@ def render_step_c():
                                 "job_description": man_desc or "N/A"
                             }
 
+                st.markdown("#### 🌐 Pilih Bahasa CV ATS")
+                lang_choice = st.radio(
+                    "Bahasa output CV ATS:",
+                    options=["auto", "id", "en"],
+                    format_func=lambda x: {
+                        "auto": "🔄 Otomatis (ikuti bahasa CV asli)",
+                        "id": "🇮🇩 Bahasa Indonesia",
+                        "en": "🇬🇧 English",
+                    }[x],
+                    horizontal=True,
+                    label_visibility="collapsed",
+                )
+
                 if st.button("✨ Generate CV ATS", type="primary", use_container_width=True):
                     with st.spinner("✨ AI sedang membuat CV ATS-friendly..."):
                         from agents.cv_analyzer_agent import generate_ats_cv
-                        result = generate_ats_cv(st.session_state.cv_text, selected_job)
+                        result = generate_ats_cv(st.session_state.cv_text, selected_job, language=lang_choice)
                         if result["available"] and result["ats_text"]:
                             st.session_state.ats_cv_text = result["ats_text"]
                             st.rerun()
