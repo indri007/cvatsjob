@@ -2,7 +2,9 @@
 Step C — Review CV.
 
 Extracted verbatim from app.py during modularization (Tahap 3).
-No behavior change from the original inline block.
+Patched: added error handling for AI calls, caching for generated
+docx/pdf bytes (avoid regenerating on every Streamlit rerun), and
+validation when "tailor CV" is checked but no job info is provided.
 """
 
 import streamlit as st
@@ -35,13 +37,16 @@ def render_step_c():
             if st.session_state.cv_feedback is None:
                 if st.button("🤖 Analisis CV Saya", type="primary", use_container_width=True):
                     with st.spinner("🤖 AI sedang menganalisis CV kamu..."):
-                        from agents.cv_analyzer_agent import review_cv
-                        result = review_cv(st.session_state.cv_text)
-                        if result["available"] and result["feedback"]:
-                            st.session_state.cv_feedback = result["feedback"]
-                            st.rerun()
-                        else:
-                            st.error("❌ Gagal menganalisis CV.")
+                        try:
+                            from agents.cv_analyzer_agent import review_cv
+                            result = review_cv(st.session_state.cv_text)
+                            if result["available"] and result["feedback"]:
+                                st.session_state.cv_feedback = result["feedback"]
+                                st.rerun()
+                            else:
+                                st.error("❌ Gagal menganalisis CV. Coba lagi beberapa saat.")
+                        except Exception as e:
+                            st.error(f"❌ Terjadi kesalahan saat menganalisis CV: {e}")
             else:
                 st.markdown(st.session_state.cv_feedback)
 
@@ -106,15 +111,28 @@ def render_step_c():
                     label_visibility="collapsed",
                 )
 
-                if st.button("✨ Generate CV ATS", type="primary", use_container_width=True):
+                if st.button(
+                    "✨ Generate CV ATS",
+                    type="primary",
+                    use_container_width=True,
+                    disabled=(tailor_opt and selected_job is None),
+                ):
                     with st.spinner("✨ AI sedang membuat CV ATS-friendly..."):
-                        from agents.cv_analyzer_agent import generate_ats_cv
-                        result = generate_ats_cv(st.session_state.cv_text, selected_job, language=lang_choice)
-                        if result["available"] and result["ats_text"]:
-                            st.session_state.ats_cv_text = result["ats_text"]
-                            st.rerun()
-                        else:
-                            st.error("❌ Gagal membuat CV ATS.")
+                        try:
+                            from agents.cv_analyzer_agent import generate_ats_cv
+                            result = generate_ats_cv(st.session_state.cv_text, selected_job, language=lang_choice)
+                            if result["available"] and result["ats_text"]:
+                                st.session_state.ats_cv_text = result["ats_text"]
+                                st.session_state.ats_docx_bytes = None
+                                st.session_state.ats_pdf_bytes = None
+                                st.rerun()
+                            else:
+                                st.error("❌ Gagal membuat CV ATS. Coba lagi beberapa saat.")
+                        except Exception as e:
+                            st.error(f"❌ Terjadi kesalahan saat membuat CV ATS: {e}")
+
+                if tailor_opt and selected_job is None:
+                    st.caption("⚠️ Isi jabatan/posisi dulu untuk mengaktifkan tombol generate.")
             else:
                 st.markdown("### 📄 Preview CV ATS")
                 st.text_area(
@@ -131,11 +149,12 @@ def render_step_c():
 
                 with col1:
                     try:
-                        from agents.cv_analyzer_agent import export_cv_to_docx
-                        docx_bytes = export_cv_to_docx(st.session_state.ats_cv_text)
+                        if st.session_state.get("ats_docx_bytes") is None:
+                            from agents.cv_analyzer_agent import export_cv_to_docx
+                            st.session_state.ats_docx_bytes = export_cv_to_docx(st.session_state.ats_cv_text)
                         st.download_button(
                             "📄 Download Word (.docx)",
-                            data=docx_bytes,
+                            data=st.session_state.ats_docx_bytes,
                             file_name="CV_ATS_Optimized.docx",
                             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                             use_container_width=True,
@@ -145,11 +164,12 @@ def render_step_c():
 
                 with col2:
                     try:
-                        from agents.cv_analyzer_agent import export_cv_to_pdf
-                        pdf_bytes = export_cv_to_pdf(st.session_state.ats_cv_text)
+                        if st.session_state.get("ats_pdf_bytes") is None:
+                            from agents.cv_analyzer_agent import export_cv_to_pdf
+                            st.session_state.ats_pdf_bytes = export_cv_to_pdf(st.session_state.ats_cv_text)
                         st.download_button(
                             "📑 Download PDF (.pdf)",
-                            data=pdf_bytes,
+                            data=st.session_state.ats_pdf_bytes,
                             file_name="CV_ATS_Optimized.pdf",
                             mime="application/pdf",
                             use_container_width=True,
@@ -159,6 +179,8 @@ def render_step_c():
 
                 if st.button("🔄 Generate Ulang"):
                     st.session_state.ats_cv_text = None
+                    st.session_state.ats_docx_bytes = None
+                    st.session_state.ats_pdf_bytes = None
                     st.rerun()
 
     # Navigation
