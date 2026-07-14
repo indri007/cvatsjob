@@ -571,10 +571,51 @@ header {
 /* ── Landing Page Login (navy + gold, terinspirasi referensi desain) ── */
 .jm-landing {
     background: linear-gradient(135deg, #0B1F3A 0%, #132A4C 60%, #16345C 100%);
-    border-radius: 20px;
+    border-radius: 20px 20px 0 0;
     padding: 48px 44px 0 44px;
     margin: 12px 0 0 0;
     overflow: hidden;
+}
+
+.jm-landing-right-title {
+    color: #ffffff;
+    font-size: 1.4rem;
+    font-weight: 800;
+    line-height: 1.35;
+    margin: 0 0 18px 4px;
+}
+
+.jm-landing-trust {
+    background: linear-gradient(135deg, #0B1F3A 0%, #132A4C 60%, #16345C 100%);
+    padding: 0 44px 32px 44px;
+    text-align: center;
+}
+
+.jm-landing-trust-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.6;
+    margin: 0 auto;
+    max-width: 620px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-top: 24px;
+}
+
+.jm-landing-footer {
+    background: #f8fafc;
+    padding: 18px 44px;
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    flex-wrap: wrap;
+    border-radius: 0 0 20px 20px;
+}
+
+.jm-landing-footer span {
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 600;
 }
 
 .jm-landing-grid {
@@ -691,12 +732,11 @@ header {
 
 .jm-landing-stripe {
     background: linear-gradient(90deg, #F5C451, #F0B93E);
-    padding: 14px 44px;
+    padding: 20px 44px;
     display: flex;
     justify-content: center;
     gap: 48px;
     flex-wrap: wrap;
-    border-radius: 0 0 20px 20px;
 }
 
 .jm-landing-stripe-stat {

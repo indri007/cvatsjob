@@ -98,6 +98,7 @@ def require_google_login():
                         </div>
                     </div>
                     <div class="jm-landing-features">
+                        <p class="jm-landing-right-title">Dapat kerja dengan AI dan data lowongan asli.</p>
                         <div class="jm-feature-card">
                             <div class="jm-feature-icon">📄</div>
                             <div>
@@ -127,19 +128,37 @@ def require_google_login():
         )
         st.markdown(
             """
+            <div class="jm-landing-trust">
+                <p class="jm-landing-trust-text">
+                    Dibangun khusus untuk pencari kerja Indonesia - didukung Gemini AI
+                    dan database lowongan kerja nyata, bukan data simulasi.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            """
             <div class="jm-landing-stripe">
-                <div class="jm-landing-stripe-stat">
-                    <div class="jm-landing-stripe-num">100%</div>
-                    <div class="jm-landing-stripe-label">Keamanan data (Google OAuth)</div>
-                </div>
                 <div class="jm-landing-stripe-stat">
                     <div class="jm-landing-stripe-num">500+</div>
                     <div class="jm-landing-stripe-label">Lowongan kerja aktif</div>
                 </div>
                 <div class="jm-landing-stripe-stat">
-                    <div class="jm-landing-stripe-num">Gemini</div>
-                    <div class="jm-landing-stripe-label">AI di balik JobMatch AI</div>
+                    <div class="jm-landing-stripe-num">5</div>
+                    <div class="jm-landing-stripe-label">Fitur berbasis AI dalam 1 aplikasi</div>
                 </div>
+                <div class="jm-landing-stripe-stat">
+                    <div class="jm-landing-stripe-num">100%</div>
+                    <div class="jm-landing-stripe-label">Login aman Google OAuth</div>
+                </div>
+            </div>
+            <div class="jm-landing-footer">
+                <span>Tentang Kami</span>
+                <span>Fitur</span>
+                <span>Cara Kerja</span>
+                <span>Bantuan</span>
+                <span>Kebijakan Privasi</span>
             </div>
             """,
             unsafe_allow_html=True,
