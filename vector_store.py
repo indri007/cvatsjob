@@ -50,13 +50,19 @@ class VectorStoreManager:
         return res[0]
 
     def _get_embeddings(self, texts: list[str]) -> list[list[float]]:
-        """Generate embeddings for a list of texts using Gemini API with retry logic."""
+        """Generate embeddings for a list of texts using Gemini API with retry
+        logic. Falls back to OpenAI (forced to 768 dims to match the existing
+        Qdrant/ChromaDB collection) if Gemini's quota is exhausted and
+        config.is_openai_configured() is true. If neither is available,
+        behaves exactly as before (raises the original Gemini error)."""
         if not config.is_gemini_configured() or not texts:
+            if config.is_openai_configured() and texts:
+                return self._get_embeddings_openai(texts)
             return [[0.0] * 768 for _ in texts]
         client = config.get_gemini_client()
         from google.genai import types
         import time
-        
+
         max_retries = 5
         for attempt in range(max_retries):
             try:
@@ -67,11 +73,42 @@ class VectorStoreManager:
                 )
                 return [emb.values for emb in response.embeddings]
             except Exception as e:
+                is_quota_error = "RESOURCE_EXHAUSTED" in str(e) or "429" in str(e) or "quota" in str(e).lower()
+                if is_quota_error and config.is_openai_configured():
+                    print(f"Gemini quota exhausted, falling back to OpenAI embeddings: {e}")
+                    return self._get_embeddings_openai(texts)
                 if attempt == max_retries - 1:
                     raise e
                 print(f"Gemini API error (attempt {attempt+1}/{max_retries}): {e}. Retrying in {2 ** attempt}s...")
                 time.sleep(2 ** attempt)
         return [[0.0] * 768 for _ in texts]
+
+    def _get_embeddings_openai(self, texts: list[str]) -> list[list[float]]:
+        """Backup embedding path via OpenAI, only used when Gemini's quota
+        is exhausted. Forces dimensions=768 so vectors stay compatible with
+        the existing Qdrant/ChromaDB collection (created with size=768)."""
+        import httpx
+
+        headers = {
+            "Authorization": f"Bearer {config.OPENAI_API_KEY}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "model": config.OPENAI_EMBEDDING_MODEL,
+            "input": texts,
+            "dimensions": 768,
+        }
+        with httpx.Client(timeout=30.0) as client:
+            resp = client.post(
+                "https://api.openai.com/v1/embeddings",
+                headers=headers,
+                json=payload,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+        # OpenAI returns results possibly out of input order; sort by index.
+        ordered = sorted(data["data"], key=lambda d: d["index"])
+        return [item["embedding"] for item in ordered]
 
     def add_documents(self, documents: list[str], metadatas: list[dict], ids: list[str]):
         """Add job documents to the vector store."""

@@ -70,6 +70,15 @@ def is_gemini_configured() -> bool:
     return bool(GEMINI_API_KEY)
 
 
+# ─── OpenAI (backup embedding, dipakai hanya kalau Gemini quota habis) ────
+OPENAI_API_KEY = _get("OPENAI_API_KEY")
+OPENAI_EMBEDDING_MODEL = _get("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
+
+def is_openai_configured() -> bool:
+    """Check if OpenAI API key is set (dipakai sebagai backup embedding)."""
+    return bool(OPENAI_API_KEY)
+
+
 def ensure_data_dir():
     """Create data directory if it doesn't exist."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
