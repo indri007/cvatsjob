@@ -442,6 +442,10 @@ header {
     visibility: hidden;
 }
 
+[data-testid="stSidebarNav"] {
+    display: none;
+}
+
 /* ── Animations ──────────────────────────────────────────── */
 @keyframes fadeInUp {
     from {
