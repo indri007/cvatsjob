@@ -20,15 +20,15 @@ _css_path = Path(__file__).parent / "styles.css"
 if _css_path.exists():
     st.markdown(f"<style>{_css_path.read_text(encoding='utf-8')}</style>", unsafe_allow_html=True)
 
-import auth_setup
-auth_setup.require_google_login()
-auth_setup.show_user_badge_and_logout(location="sidebar")
-from pathlib import Path
-
 import config
 from customer_service_chat_floating import render_cs_chatbot
 from database import DatabaseManager
 from vector_store import VectorStoreManager
+
+
+import auth_setup
+auth_setup.require_google_login()
+auth_setup.show_user_badge_and_logout(location="sidebar")
 
 import nav
 from nav import STEPS, go_to_step
@@ -63,23 +63,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
-
-# ─── Google Auth Check ─────────────────────────────────────
-# NOTE: kept exactly as in the original app.py. This duplicates
-# auth_setup.require_google_login() above; flagged as a Tahap 6
-# (File Cleanup) candidate rather than changed here, to keep this
-# modularization behavior-neutral.
-if not st.user.is_logged_in:
-    st.title("🎯 JobMatch AI")
-    st.write("Silakan login dengan akun Google untuk melanjutkan.")
-    if st.button("Login dengan Google"):
-        st.login()
-    st.stop()
-
-st.sidebar.write(f"👋 Halo, {st.user.name}")
-st.sidebar.write(f"📧 {st.user.email}")
-if st.sidebar.button("Logout"):
-    st.logout()
 
 # ─── Load CSS ─────────────────────────────────────────────
 # CSS sudah di-load di atas, sebelum cek login
