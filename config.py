@@ -23,7 +23,7 @@ def _get(key: str, default: str = "") -> str:
     return os.getenv(key, default)
 
 # ─── Gemini ───────────────────────────────────────────────
-GEMINI_API_KEY = _get("GEMINI_API_KEY")
+GEMINI_API_KEY = _get("GEMINI_API_KEY") or _get("GOOGLE_API_KEY")
 GEMINI_MODEL = _get("GEMINI_MODEL", "gemini-2.5-flash")
 GEMINI_EMBEDDING_MODEL = _get("GEMINI_EMBEDDING_MODEL", "models/gemini-embedding-001")
 
