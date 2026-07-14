@@ -4,18 +4,27 @@
 Buka Aiven Console -> service MySQL kamu -> Overview -> bagian "CA certificate"
 -> download, lalu simpan sebagai `ca.pem` di folder ini (sejajar dengan `database.py`).
 
-## 2. File .env
+## 2. File .env (development lokal)
 File `.env` sudah disertakan di paket ini dengan DATABASE_URL berikut:
-
 ```
 DATABASE_URL=mysql+pymysql://avnadmin:YOUR_PASSWORD@your-host.aivencloud.com:PORT/defaultdb
 ```
-
 Isi juga OPENAI_API_KEY di file .env sebelum menjalankan app.
 
 PENTING: Karena password ini sudah pernah dikirim di chat, sebaiknya reset password
 avnadmin dari Aiven Console (Service -> Users -> avnadmin -> Reset password) setelah
 migrasi selesai, lalu update ulang .env dengan password baru.
+
+> **Catatan production**: di Cloud Run (`job-search-app` dan `daily-job-fetch`),
+> `DATABASE_URL` **tidak** dibaca dari file `.env` — melainkan dari **Google Secret
+> Manager** (`gcloud secrets versions access latest --secret=DATABASE_URL`). File
+> `.env` hanya dipakai untuk development lokal di komputer/Cloud Shell kamu.
+> Kalau password Aiven direset, update juga secret-nya:
+> ```bash
+> echo -n "mysql+pymysql://avnadmin:PASSWORD_BARU@host:port/defaultdb" | \
+>   gcloud secrets versions add DATABASE_URL --data-file=-
+> ```
+> lalu redeploy service/job supaya revisi baru memakai secret terbaru.
 
 ## 3. Install dependencies
 ```
