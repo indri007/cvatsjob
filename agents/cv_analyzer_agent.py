@@ -147,17 +147,6 @@ def generate_ats_cv(cv_text: str, job_info: Optional[dict] = None, language: str
                 "\n\n[LANGUAGE INSTRUCTION]\n"
                 "OUTPUT THE CV IN ENGLISH, regardless of the original CV's language."
             )
-
-        if language == "id":
-            prompt += (
-                "\n\n[INSTRUKSI BAHASA]\n"
-                "HASILKAN CV DALAM BAHASA INDONESIA, apa pun bahasa asli CV di atas."
-            )
-        elif language == "en":
-            prompt += (
-                "\n\n[LANGUAGE INSTRUCTION]\n"
-                "OUTPUT THE CV IN ENGLISH, regardless of the original CV's language."
-            )
         
         if job_info:
             target_pos = job_info.get("job_title", "N/A")

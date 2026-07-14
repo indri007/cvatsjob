@@ -566,3 +566,162 @@ header {
     font-size: 0.92rem;
     color: var(--text-primary);
 }
+
+
+/* ── Landing Page Login (navy + gold, terinspirasi referensi desain) ── */
+.jm-landing {
+    background: linear-gradient(135deg, #0B1F3A 0%, #132A4C 60%, #16345C 100%);
+    border-radius: 20px;
+    padding: 48px 44px 0 44px;
+    margin: 12px 0 0 0;
+    overflow: hidden;
+}
+
+.jm-landing-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    padding-bottom: 40px;
+}
+
+.jm-landing-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.jm-landing-brand-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(var(--accent-blue-rgb), 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.jm-landing-brand-text {
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+}
+
+.jm-landing h1 {
+    color: #ffffff;
+    font-size: 2.1rem;
+    font-weight: 800;
+    line-height: 1.25;
+    margin: 0 0 16px 0;
+    letter-spacing: -0.01em;
+}
+
+.jm-landing-sub {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 1.02rem;
+    line-height: 1.6;
+    margin: 0 0 28px 0;
+    max-width: 460px;
+}
+
+.jm-landing-stats {
+    display: flex;
+    gap: 32px;
+    margin-top: 32px;
+}
+
+.jm-landing-stat-num {
+    color: #F5C451;
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.jm-landing-stat-label {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.85rem;
+    margin: 2px 0 0 0;
+}
+
+.jm-landing-features {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.jm-feature-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: all 0.25s ease;
+}
+
+.jm-feature-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(var(--accent-blue-rgb), 0.5);
+    transform: translateX(4px);
+}
+
+.jm-feature-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.jm-feature-title {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin: 0 0 3px 0;
+}
+
+.jm-feature-desc {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.82rem;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.jm-landing-stripe {
+    background: linear-gradient(90deg, #F5C451, #F0B93E);
+    padding: 14px 44px;
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    flex-wrap: wrap;
+    border-radius: 0 0 20px 20px;
+}
+
+.jm-landing-stripe-item {
+    color: #1B2A1A;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.jm-landing-stripe-item b {
+    font-weight: 800;
+    font-size: 1.05rem;
+}
+
+/* Restyle tombol login Streamlit supaya masuk tema landing page */
+div[data-testid="stButton"] button[kind="primary"] {
+    background: #ffffff !important;
+    color: #16345C !important;
+    border-radius: 999px !important;
+    font-weight: 700 !important;
+    padding: 12px 28px !important;
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+}
+
+div[data-testid="stButton"] button[kind="primary"]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.35) !important;
+}
