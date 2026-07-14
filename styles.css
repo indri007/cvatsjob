@@ -699,15 +699,31 @@ header {
     border-radius: 0 0 20px 20px;
 }
 
-.jm-landing-stripe-item {
-    color: #1B2A1A;
-    font-size: 0.92rem;
-    font-weight: 600;
+.jm-landing-stripe-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
-.jm-landing-stripe-item b {
+.jm-landing-stripe-num {
+    color: #16345C;
+    font-size: 1.6rem;
     font-weight: 800;
-    font-size: 1.05rem;
+    line-height: 1.1;
+}
+
+.jm-landing-stripe-label {
+    color: #16345C;
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0.85;
+}
+
+/* Sembunyikan sidebar sepenuhnya khusus di halaman login (belum ada
+   konten sidebar berguna sebelum user login) */
+.jm-hide-sidebar [data-testid="stSidebar"] {
+    display: none !important;
 }
 
 /* Tombol login Google - SCOPED cuma ke container bermarker, bukan global */

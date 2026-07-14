@@ -51,6 +51,15 @@ def require_google_login():
         st.stop()
 
     if not st.user.is_logged_in:
+        st.markdown('<style>section.stMain, div.stApp { }</style><div class="jm-hide-sidebar"></div>', unsafe_allow_html=True)
+        st.markdown(
+            """
+            <style>
+            [data-testid="stSidebar"] { display: none !important; }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
         with st.container():
             st.markdown('<div class="jm-login-btn-marker"></div>', unsafe_allow_html=True)
             st.markdown('<div class="jm-top-login-bar"></div>', unsafe_allow_html=True)
@@ -119,8 +128,18 @@ def require_google_login():
         st.markdown(
             """
             <div class="jm-landing-stripe">
-                <div class="jm-landing-stripe-item">Login aman dengan <b>Google OAuth</b></div>
-                <div class="jm-landing-stripe-item">Ditenagai <b>Gemini AI</b></div>
+                <div class="jm-landing-stripe-stat">
+                    <div class="jm-landing-stripe-num">100%</div>
+                    <div class="jm-landing-stripe-label">Keamanan data (Google OAuth)</div>
+                </div>
+                <div class="jm-landing-stripe-stat">
+                    <div class="jm-landing-stripe-num">500+</div>
+                    <div class="jm-landing-stripe-label">Lowongan kerja aktif</div>
+                </div>
+                <div class="jm-landing-stripe-stat">
+                    <div class="jm-landing-stripe-num">Gemini</div>
+                    <div class="jm-landing-stripe-label">AI di balik JobMatch AI</div>
+                </div>
             </div>
             """,
             unsafe_allow_html=True,
