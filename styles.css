@@ -10,9 +10,10 @@
     --bg-primary: #f8fafc;
     --bg-secondary: #ffffff;
     --bg-card: #ffffff;
-    --bg-card-hover: #f1f5f9;
-    --accent-blue: #0f62fe;
-    --accent-blue-hover: #0353e9;
+    --bg-card-hover: #eef5ff;
+    --accent-blue: #2D8CFF;
+    --accent-blue-rgb: 45, 140, 255;
+    --accent-blue-hover: #0B5CFF;
     --accent-purple: #8a3ffc;
     --accent-emerald: #198038;
     --accent-amber: #b28600;
@@ -21,9 +22,9 @@
     --text-secondary: #525252;
     --text-muted: #8d8d8d;
     --border-color: #dde1e6;
-    --glass-bg: rgba(15, 98, 254, 0.05);
-    --shadow-glow: 0 4px 24px rgba(15, 98, 254, 0.08);
-    --gradient-primary: linear-gradient(135deg, #0f62fe, #002d9c);
+    --glass-bg: rgba(45, 140, 255, 0.06);
+    --shadow-glow: 0 4px 24px rgba(45, 140, 255, 0.15);
+    --gradient-primary: linear-gradient(135deg, #2D8CFF, #0B5CFF);
     --gradient-success: linear-gradient(135deg, #24a148, #198038);
     --gradient-warm: linear-gradient(135deg, #f1c21b, #da1e28);
 }
@@ -68,9 +69,9 @@
 }
 
 .step-item.active {
-    background: rgba(0, 212, 255, 0.1);
+    background: rgba(var(--accent-blue-rgb), 0.1);
     border-color: var(--accent-blue);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+    box-shadow: 0 0 20px rgba(var(--accent-blue-rgb), 0.1);
 }
 
 .step-item.completed {
@@ -99,7 +100,7 @@
 .step-icon.active {
     background: var(--gradient-primary);
     color: white;
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+    box-shadow: 0 0 15px rgba(var(--accent-blue-rgb), 0.4);
 }
 
 .step-icon.completed {
@@ -137,7 +138,7 @@
 
 .glass-card:hover {
     background: var(--bg-card-hover);
-    border-color: rgba(0, 212, 255, 0.2);
+    border-color: rgba(var(--accent-blue-rgb), 0.2);
     box-shadow: var(--shadow-glow);
     transform: translateY(-2px);
 }
@@ -180,7 +181,7 @@
 }
 
 .job-card:hover {
-    border-color: rgba(0, 212, 255, 0.3);
+    border-color: rgba(var(--accent-blue-rgb), 0.3);
     box-shadow: var(--shadow-glow);
     transform: translateY(-2px);
 }
@@ -332,7 +333,7 @@
 
 /* ── Upload Area ─────────────────────────────────────────── */
 [data-testid="stFileUploader"] {
-    border: 2px dashed rgba(0, 212, 255, 0.3) !important;
+    border: 2px dashed rgba(var(--accent-blue-rgb), 0.3) !important;
     border-radius: 16px !important;
     padding: 20px !important;
     transition: all 0.3s ease !important;
@@ -340,7 +341,7 @@
 
 [data-testid="stFileUploader"]:hover {
     border-color: var(--accent-blue) !important;
-    background: rgba(0, 212, 255, 0.03) !important;
+    background: rgba(var(--accent-blue-rgb), 0.03) !important;
 }
 
 /* ── Buttons ─────────────────────────────────────────────── */
@@ -356,11 +357,11 @@
 .stButton>button[kind="primary"] {
     background: var(--gradient-primary) !important;
     color: white !important;
-    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(var(--accent-blue-rgb), 0.25) !important;
 }
 
 .stButton>button[kind="primary"]:hover {
-    box-shadow: 0 6px 25px rgba(0, 212, 255, 0.4) !important;
+    box-shadow: 0 6px 25px rgba(var(--accent-blue-rgb), 0.4) !important;
     transform: translateY(-1px) !important;
 }
 
@@ -406,7 +407,7 @@
 }
 
 .stTabs [aria-selected="true"] {
-    background: rgba(0, 212, 255, 0.1) !important;
+    background: rgba(var(--accent-blue-rgb), 0.1) !important;
 }
 
 /* ── Expander ────────────────────────────────────────────── */
@@ -502,4 +503,62 @@ header {
 .voice-btn.recording {
     animation: pulse 1s infinite;
     background: var(--accent-rose);
+}
+
+/* ── Interactive Step Icons (Sidebar Nav) ────────────────── */
+.step-item .step-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    margin-right: 10px;
+    transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.step-item:hover .step-icon {
+    transform: scale(1.18) rotate(-4deg);
+    filter: drop-shadow(0 2px 6px rgba(var(--accent-blue-rgb), 0.45));
+}
+
+.step-item.active .step-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 2px 8px rgba(var(--accent-blue-rgb), 0.55));
+}
+
+/* ── Google-style Profile Avatar ──────────────────────────── */
+.gauth-avatar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(var(--accent-blue-rgb), 0.06);
+    border: 1px solid rgba(var(--accent-blue-rgb), 0.18);
+    transition: all 0.25s ease;
+    width: fit-content;
+}
+
+.gauth-avatar-wrap:hover {
+    background: rgba(var(--accent-blue-rgb), 0.12);
+    box-shadow: 0 2px 12px rgba(var(--accent-blue-rgb), 0.25);
+}
+
+.gauth-avatar-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(var(--accent-blue-rgb), 0.15);
+    transition: box-shadow 0.25s ease;
+}
+
+.gauth-avatar-wrap:hover .gauth-avatar-img {
+    box-shadow: 0 0 0 4px rgba(var(--accent-blue-rgb), 0.3);
+}
+
+.gauth-avatar-name {
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--text-primary);
 }

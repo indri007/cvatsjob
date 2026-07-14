@@ -73,7 +73,16 @@ def show_user_badge_and_logout(location="sidebar"):
         name = getattr(st.user, "name", None) or getattr(st.user, "email", "User")
         picture = getattr(st.user, "picture", None)
         if picture:
-            target.image(picture, width=32)
-        target.markdown(f"**👋 {name}**")
+            target.markdown(
+                f"""
+                <div class="gauth-avatar-wrap">
+                    <img class="gauth-avatar-img" src="{picture}" />
+                    <span class="gauth-avatar-name">👋 {name}</span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        else:
+            target.markdown(f"**👋 {name}**")
         if target.button("Logout", key="btn_logout_google"):
             st.logout()
