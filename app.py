@@ -14,6 +14,12 @@ monolithic app.py.
 """
 
 import streamlit as st
+from pathlib import Path
+
+_css_path = Path(__file__).parent / "styles.css"
+if _css_path.exists():
+    st.markdown(f"<style>{_css_path.read_text(encoding='utf-8')}</style>", unsafe_allow_html=True)
+
 import auth_setup
 auth_setup.require_google_login()
 auth_setup.show_user_badge_and_logout(location="sidebar")
@@ -76,9 +82,7 @@ if st.sidebar.button("Logout"):
     st.logout()
 
 # ─── Load CSS ─────────────────────────────────────────────
-css_path = Path(__file__).parent / "styles.css"
-if css_path.exists():
-    st.markdown(f"<style>{css_path.read_text(encoding='utf-8')}</style>", unsafe_allow_html=True)
+# CSS sudah di-load di atas, sebelum cek login
 
 # ─── Session State Initialization ─────────────────────────
 nav.init_session_state()
