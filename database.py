@@ -5,7 +5,7 @@ Handles structured job data queries (filters, stats, etc.)
 
 import re
 from typing import Optional
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, Float
+from sqlalchemy import create_engine, Column, Integer, String, Text, Float
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy import text as sql_text
 import config
