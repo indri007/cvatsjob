@@ -7,7 +7,6 @@ Dilengkapi perbaikan encoding/mojibake untuk mendukung berbagai bahasa
 import io
 import unicodedata
 from pathlib import Path
-from typing import Optional
 import pdfplumber
 import ftfy
 from docx import Document
