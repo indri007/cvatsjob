@@ -710,18 +710,40 @@ header {
     font-size: 1.05rem;
 }
 
-/* Restyle tombol login Streamlit supaya masuk tema landing page */
-div[data-testid="stButton"] button[kind="primary"] {
-    background: #ffffff !important;
-    color: #16345C !important;
+/* Tombol login Google - SCOPED cuma ke container bermarker, bukan global */
+div[data-testid="stVerticalBlock"]:has(div.jm-login-btn-marker) button[kind="primary"],
+div[data-testid="stVerticalBlockBorderWrapper"]:has(div.jm-login-btn-marker) button[kind="primary"] {
+    background: var(--accent-blue) !important;
+    color: #ffffff !important;
     border-radius: 999px !important;
     font-weight: 700 !important;
     padding: 12px 28px !important;
     border: none !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+    box-shadow: 0 4px 20px rgba(var(--accent-blue-rgb), 0.4) !important;
 }
 
-div[data-testid="stButton"] button[kind="primary"]:hover {
+div[data-testid="stVerticalBlock"]:has(div.jm-login-btn-marker) button[kind="primary"]:hover,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(div.jm-login-btn-marker) button[kind="primary"]:hover {
+    background: var(--accent-blue-hover) !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.35) !important;
+}
+
+.jm-top-login-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 4px 12px 4px;
+}
+
+.jm-photo-card {
+    margin-top: 24px;
+    max-width: 280px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.jm-photo-card img {
+    width: 100%;
+    display: block;
 }
