@@ -2,7 +2,58 @@
 
 Dokumen ini menjelaskan alur kerja sistem end-to-end: baik alur otomatis (auto-fetch lowongan harian) maupun alur interaktif (perjalanan pengguna lewat 5 step wizard).
 
-> **Catatan soal n8n:** requirement resmi final project (`rule/[JCAI - 2025] Final Project - N8N Version.docx`) mengacu ke versi berbasis n8n. Implementasi saat ini **tidak** memakai n8n sebagai orchestrator — otomasi harian digantikan dengan **Google Cloud Scheduler + Cloud Run Job**, dan agent AI diimplementasikan sebagai modul Python (`agents/`) alih-alih node n8n. Diagram di bawah menggambarkan node-node fungsional dengan gaya yang sama seperti workflow n8n (trigger → proses → output), supaya tetap mudah dipetakan ke versi n8n bila suatu saat migrasi dilakukan.
+> **Catatan soal n8n:** requirement resmi final project (`rule/[JCAI - 2025] Final Project - N8N Version.docx`) mengacu ke versi berbasis n8n. Implementasi **production** saat ini **tidak** memakai n8n sebagai orchestrator — otomasi harian digantikan dengan **Google Cloud Scheduler + Cloud Run Job**, dan agent AI diimplementasikan sebagai modul Python (`agents/`) alih-alih node n8n. Namun, tiga workflow n8n asli tetap disertakan di folder [`n8n_workflows/`](./n8n_workflows/) sebagai referensi/prototipe sesuai requirement resmi — diagramnya ada di bagian § 0 di bawah.
+
+---
+
+## 0. Workflow n8n (Referensi Requirement Resmi)
+
+File export asli ada di [`n8n_workflows/`](./n8n_workflows/). Diagram di bawah di-generate otomatis dari file JSON tersebut (lihat `n8n_to_mermaid.py`). Garis putus-putus (`-.label.->`) menandakan koneksi sub-komponen AI (language model, tool, vector store, embedding) — bukan alur eksekusi utama.
+
+### 0.1 `1_cv_job_matcher.json` — CV & Job Matcher (sederhana)
+
+```mermaid
+flowchart LR
+    Webhook["Webhook<br/><i>webhook</i>"]
+    OpenAI_Chat["OpenAI Chat<br/><i>openAi</i>"]
+    Respond_to_Webhook["Respond to Webhook<br/><i>respondToWebhook</i>"]
+    Webhook --> OpenAI_Chat
+    OpenAI_Chat --> Respond_to_Webhook
+```
+
+Alur paling sederhana: webhook menerima request → diproses langsung oleh OpenAI Chat → hasil dikembalikan lewat Respond to Webhook.
+
+### 0.2 `AI_Job_Assistant_3_ (1).json` / `AI Job Assistant(3).json` — AI Agent dengan RAG + SQL Tool
+
+*(kedua file punya struktur workflow yang identik)*
+
+```mermaid
+flowchart LR
+    Webhook["Webhook<br/><i>webhook</i>"]
+    AI_Agent["AI Agent<br/><i>agent</i>"]
+    Groq_Chat_Model["Groq Chat Model<br/><i>lmChatGroq</i>"]
+    Vector_Store_Tool["Vector Store Tool<br/><i>toolVectorStore</i>"]
+    Qdrant_Vector_Store["Qdrant Vector Store<br/><i>vectorStoreQdrant</i>"]
+    Cohere_Embeddings["Cohere Embeddings<br/><i>embeddingsCohere</i>"]
+    Execute_a_SQL_query_in_MySQL["Execute a SQL query in MySQL<br/><i>mySqlTool</i>"]
+    OpenAI_Chat_Model["OpenAI Chat Model<br/><i>lmChatOpenAi</i>"]
+    Webhook --> AI_Agent
+    Vector_Store_Tool -.tool.-> AI_Agent
+    Qdrant_Vector_Store -.vectorStore.-> Vector_Store_Tool
+    Cohere_Embeddings -.embedding.-> Qdrant_Vector_Store
+    Execute_a_SQL_query_in_MySQL -.tool.-> AI_Agent
+    OpenAI_Chat_Model -.languageModel.-> AI_Agent
+    OpenAI_Chat_Model -.languageModel.-> Vector_Store_Tool
+```
+
+Alur: webhook memicu **AI Agent**, yang punya akses ke tiga tool —
+- **Vector Store Tool** (semantic search lewat Qdrant, dengan Cohere sebagai embedding model)
+- **SQL Tool** (query langsung ke MySQL)
+- **OpenAI Chat Model** sebagai language model utama untuk reasoning agent
+
+> Catatan: node **Groq Chat Model** ada di file tapi tidak terhubung ke node manapun — kemungkinan alternatif LLM yang belum diaktifkan/di-switch di workflow ini.
+
+Pemetaan ke implementasi Python saat ini: kombinasi Vector Store Tool + SQL Tool + Agent ini setara dengan `rag_agent.py` + `sql_agent.py` yang dipanggil dari `step_b_jobs.py` (lihat § 2 di bawah).
 
 ---
 
