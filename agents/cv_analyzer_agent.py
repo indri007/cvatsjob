@@ -287,6 +287,39 @@ def export_cv_to_pdf(cv_text: str) -> bytes:
     return buffer.getvalue()
 
 
+MATCH_GAP_PROMPT = """Kamu adalah Career Strategist & ATS Analyst berpengalaman.
+Tugasmu adalah membandingkan CV kandidat dengan SATU lowongan kerja spesifik,
+lalu berikan analisis kecocokan dan gap yang jujur dan actionable.
+
+Berikan output dalam format berikut (gunakan heading yang sama persis):
+
+## 🎯 Skor Kecocokan: [angka 0-100]/100
+
+## ✅ Skill & Pengalaman yang Match
+- [poin yang ada di CV DAN diminta lowongan]
+- [poin lain]
+
+## ⚠️ Gap yang Perlu Diperhatikan
+- [skill/kualifikasi yang diminta lowongan tapi TIDAK ADA/kurang jelas di CV]
+- [poin lain]
+
+## 💡 Strategi Konkret
+- [saran spesifik: skill apa yang perlu dipelajari/di-highlight, sertifikasi
+  yang relevan, atau cara reframe pengalaman yang ada supaya lebih cocok]
+- [saran lain]
+
+## 📊 Ringkasan
+[1-2 kalimat kesimpulan jujur: apakah kandidat sudah cukup kompetitif untuk
+posisi ini, atau perlu persiapan tambahan]
+
+ATURAN:
+1. Skor HARUS jujur dan realistis - jangan selalu tinggi untuk menyenangkan user.
+   Kalau memang kurang cocok, skor rendah dan jelaskan kenapa.
+2. Gap yang disebut harus SPESIFIK, merujuk ke requirement asli di deskripsi
+   lowongan, bukan generik.
+3. Jawab dalam Bahasa Indonesia."""
+
+
 def analyze_match_and_gap(cv_text: str, job_info: dict) -> dict:
     """
     Analyze CV match level against a specific job, and identify skill gaps.
