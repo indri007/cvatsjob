@@ -30,7 +30,9 @@ def render_step_c():
             icon="🔑",
         )
     else:
-        tab1, tab2 = st.tabs(["📊 Feedback & Saran", "📝 Generate CV ATS"])
+        tab1, tab2, tab3 = st.tabs([
+            "📊 Feedback & Saran", "📝 Generate CV ATS", "🎯 Kecocokan & Gap Analysis"
+        ])
 
         # ── Tab 1: CV Feedback ──
         with tab1:
@@ -181,6 +183,80 @@ def render_step_c():
                     st.session_state.ats_cv_text = None
                     st.session_state.ats_docx_bytes = None
                     st.session_state.ats_pdf_bytes = None
+                    st.rerun()
+
+        # ── Tab 3: Match Level & Gap Analysis ──
+        with tab3:
+            st.markdown(
+                """<div class="glass-card">
+                    <h4 style="color:var(--accent-blue);">🎯 Analisis Kecocokan & Gap</h4>
+                    <p style="font-size:0.9rem; color:var(--text-secondary);">
+                        Bandingkan CV kamu dengan SATU lowongan spesifik: dapatkan skor kecocokan,
+                        skill yang sudah match, gap yang perlu diperbaiki, dan strategi konkret.
+                    </p>
+                </div>""",
+                unsafe_allow_html=True,
+            )
+
+            if "gap_analysis_result" not in st.session_state:
+                st.session_state.gap_analysis_result = None
+
+            if st.session_state.gap_analysis_result is None:
+                st.markdown("#### 🎯 Pilih Lowongan Sasaran")
+
+                gap_job = None
+                if st.session_state.job_matches:
+                    gap_job_options = {}
+                    for j in st.session_state.job_matches:
+                        meta = j.get("metadata", {})
+                        label = f"{meta.get('job_title', 'N/A')} — {meta.get('company_name', 'N/A')}"
+                        gap_job_options[label] = {
+                            "job_title": meta.get("job_title", ""),
+                            "company_name": meta.get("company_name", ""),
+                            "job_description": j.get("document", ""),
+                        }
+
+                    gap_selected_label = st.selectbox(
+                        "Pilih posisi dari rekomendasi lowongan:",
+                        list(gap_job_options.keys()),
+                        key="gap_job_select",
+                    )
+                    gap_job = gap_job_options[gap_selected_label]
+                else:
+                    st.info("💡 Tidak ada rekomendasi lowongan yang ditemukan. Masukkan informasi lowongan secara manual:")
+                    gap_man_title = st.text_input("Jabatan / Posisi", placeholder="contoh: Backend Developer", key="gap_man_title")
+                    gap_man_company = st.text_input("Nama Perusahaan", placeholder="contoh: PT Maju Bersama", key="gap_man_company")
+                    gap_man_desc = st.text_area("Deskripsi Pekerjaan", placeholder="Kualifikasi, deskripsi tugas...", key="gap_man_desc")
+                    if gap_man_title and gap_man_desc:
+                        gap_job = {
+                            "job_title": gap_man_title,
+                            "company_name": gap_man_company or "Unknown Company",
+                            "job_description": gap_man_desc,
+                        }
+
+                analyze_disabled = gap_job is None
+                if analyze_disabled:
+                    st.caption("⚠️ Pilih atau isi lowongan dulu sebelum analisis (deskripsi pekerjaan wajib diisi).")
+
+                if st.button(
+                    "🔍 Analisis Kecocokan & Gap",
+                    type="primary",
+                    use_container_width=True,
+                    disabled=analyze_disabled,
+                ):
+                    with st.spinner("🎯 AI sedang menganalisis kecocokan dan gap..."):
+                        from agents.cv_analyzer_agent import analyze_match_and_gap
+                        result = analyze_match_and_gap(st.session_state.cv_text, gap_job)
+                        if result["available"] and result["analysis"]:
+                            st.session_state.gap_analysis_result = result["analysis"]
+                            st.rerun()
+                        else:
+                            st.error("❌ Gagal menganalisis kecocokan CV.")
+            else:
+                st.markdown(st.session_state.gap_analysis_result)
+
+                if st.button("🔄 Analisis Ulang", key="gap_reanalyze"):
+                    st.session_state.gap_analysis_result = None
                     st.rerun()
 
     # Navigation
