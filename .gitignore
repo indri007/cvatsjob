@@ -9,3 +9,6 @@ data/chroma_db/
 *.bak_before_upload
 *.b64
 setup_observability.sh
+rapidapi_key.txt
+*.key
+*_key.txt
