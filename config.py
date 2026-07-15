@@ -79,6 +79,11 @@ def is_openai_configured() -> bool:
     return bool(OPENAI_API_KEY)
 
 
+def is_n8n_configured() -> bool:
+    """Check if N8N webhook URL is set (dipakai untuk fitur AI Job Assistant via N8N)."""
+    return bool(N8N_WEBHOOK_URL)
+
+
 def ensure_data_dir():
     """Create data directory if it doesn't exist."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)

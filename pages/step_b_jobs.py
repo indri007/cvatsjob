@@ -25,7 +25,10 @@ def render_step_b():
         unsafe_allow_html=True,
     )
 
-    tab1, tab2, tab3 = st.tabs(["🔍 Dari Dataset (AI Match)", "🌐 Cari di Internet", "⚡ Scrape Lowongan Live"])
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "🔍 Dari Dataset (AI Match)", "🌐 Cari di Internet",
+        "⚡ Scrape Lowongan Live", "🤖 Tanya AI (N8N)"
+    ])
 
     search_keyword = ""
 
@@ -206,6 +209,69 @@ def render_step_b():
                 st.rerun()
             except Exception as e:
                 status_box.error(f"❌ Scraping gagal: {e}")
+
+    # ── Tab 4: N8N AI Job Assistant ──
+    with tab4:
+        st.markdown(
+            """<div class="glass-card">
+                <h4 style="color:var(--accent-blue);">🤖 Tanya AI Job Assistant</h4>
+                <p style="font-size:0.9rem; color:var(--text-secondary);">
+                    Fitur ini didukung oleh workflow multi-agent yang di-deploy di N8N
+                    (Agent RAG untuk pencarian semantik + Agent SQL untuk data terstruktur
+                    seperti gaji dan tipe kerja). Tanya apa saja soal lowongan kerja
+                    dalam bahasa natural.
+                </p>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+
+        if not config.is_n8n_configured():
+            st.warning(
+                "⚠️ Fitur ini belum dikonfigurasi. Tambahkan `N8N_WEBHOOK_URL`.",
+                icon="🔑",
+            )
+        else:
+            if "n8n_chat_history" not in st.session_state:
+                st.session_state.n8n_chat_history = []
+
+            for msg in st.session_state.n8n_chat_history:
+                with st.chat_message(msg["role"]):
+                    st.markdown(msg["content"])
+
+            example_cols = st.columns(3)
+            examples = [
+                "Ada lowongan data analyst di Jakarta?",
+                "Lowongan dengan gaji di atas 8 juta full time?",
+                "Rekomendasi lowongan untuk fresh graduate?",
+            ]
+            for i, ex in enumerate(examples):
+                if example_cols[i].button(ex, key=f"n8n_example_{i}", use_container_width=True):
+                    st.session_state.n8n_pending_query = ex
+
+            user_query = st.chat_input("Tanya soal lowongan kerja...", key="n8n_chat_input")
+            pending = st.session_state.pop("n8n_pending_query", None)
+            query_to_send = user_query or pending
+
+            if query_to_send:
+                st.session_state.n8n_chat_history.append({"role": "user", "content": query_to_send})
+                with st.spinner("🤖 AI Job Assistant (N8N) sedang mencari..."):
+                    from n8n_client import ask_n8n_agent
+                    result = ask_n8n_agent(query_to_send)
+
+                if result["answer"]:
+                    reply = result["answer"]
+                elif result["error"]:
+                    reply = f"⚠️ {result['error']}"
+                else:
+                    reply = "⚠️ Tidak ada jawaban dari AI Job Assistant."
+
+                st.session_state.n8n_chat_history.append({"role": "assistant", "content": reply})
+                st.rerun()
+
+            if st.session_state.n8n_chat_history:
+                if st.button("🔄 Mulai Percakapan Baru", key="n8n_clear_chat"):
+                    st.session_state.n8n_chat_history = []
+                    st.rerun()
 
     # Navigation buttons
     st.markdown("---")
