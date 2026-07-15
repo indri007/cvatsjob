@@ -285,3 +285,41 @@ def export_cv_to_pdf(cv_text: str) -> bytes:
     doc.build(elements)
     buffer.seek(0)
     return buffer.getvalue()
+
+
+def analyze_match_and_gap(cv_text: str, job_info: dict) -> dict:
+    """
+    Analyze CV match level against a specific job, and identify skill gaps.
+
+    Args:
+        cv_text: User's CV content
+        job_info: dict with job_title, company_name, job_description
+
+    Returns dict with:
+    - "analysis": AI-generated match/gap analysis markdown
+    - "available": whether Gemini is configured
+    """
+    if not config.is_gemini_configured():
+        return {"analysis": None, "available": False}
+
+    try:
+        client = config.get_gemini_client()
+        target_pos = job_info.get("job_title", "N/A")
+        target_company = job_info.get("company_name", "N/A")
+        target_desc = job_info.get("job_description", "N/A")
+
+        prompt = (
+            f"{MATCH_GAP_PROMPT}\n\n"
+            f"[CV KANDIDAT]\n{cv_text}\n\n"
+            f"[LOWONGAN SASARAN]\n"
+            f"Posisi: {target_pos}\n"
+            f"Perusahaan: {target_company}\n"
+            f"Deskripsi Lowongan:\n{target_desc[:2000]}"
+        )
+        response = client.models.generate_content(
+            model=config.GEMINI_MODEL,
+            contents=prompt,
+        )
+        return {"analysis": response.text, "available": True}
+    except Exception as e:
+        return {"analysis": f"Error: {str(e)}", "available": True}
