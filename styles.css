@@ -803,3 +803,25 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(div.jm-login-btn-marker) but
     width: 100%;
     display: block;
 }
+
+
+/* ── Fix: beri "zona aman" bawah supaya tidak tabrakan dengan
+   st.chat_input() Streamlit (selalu fixed-bottom di halaman manapun
+   yang pakai chat_input: Interview, Konsultasi, tab N8N) ── */
+.main .block-container {
+    padding-bottom: 110px !important;
+}
+
+/* Naikkan tombol toggle customer service ke atas bar chat_input,
+   supaya tidak lagi tertutup/tabrakan */
+.cs-toggle-marker + div button {
+    bottom: 90px !important;
+}
+div[data-testid="stVerticalBlock"]:has(div.cs-toggle-marker),
+div[data-testid="stVerticalBlockBorderWrapper"]:has(div.cs-toggle-marker) {
+    bottom: 90px !important;
+}
+div[data-testid="stVerticalBlock"]:has(div.cs-widget-marker),
+div[data-testid="stVerticalBlockBorderWrapper"]:has(div.cs-widget-marker) {
+    bottom: 160px !important;
+}
