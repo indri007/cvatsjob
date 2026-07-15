@@ -1,41 +1,30 @@
 """
 Lightweight health-check HTTP server, run in a background thread alongside
 Streamlit.
-
-IMPORTANT (Cloud Run): this listens on its own port (default 8081), which
-is NOT reachable from the public service URL — Cloud Run only forwards
-external traffic to the single $PORT the container declares (used by
-Streamlit itself). This server is for:
-  1. Cloud Run startup/liveness probes configured against this port in the
-     service spec (gcloud run services update --... or YAML), and
-  2. local/internal debugging via `gcloud run services proxy` or
-     `kubectl port-forward`-style tooling.
-
-For a publicly-curlable basic liveness check, use Streamlit's own built-in
-route on the main port instead: GET /_stcore/health -> "ok"
 """
 
 import json
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
-
-import health_check
 from logger import get_logger
 
 logger = get_logger("health_server")
 
-
 class HealthHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
-        pass  # suppress default stderr access logs; structured logger used instead
+        pass
 
     def do_GET(self):
         if self.path == "/health":
             self._respond(200, {"status": "ok"})
         elif self.path == "/health/deep":
-            result = health_check.run_all_checks()
-            code = 200 if result["status"] == "ok" else 503
-            self._respond(code, result)
+            try:
+                import health_check
+                result = health_check.run_all_checks()
+                code = 200 if result.get("status") == "ok" else 503
+                self._respond(code, result)
+            except Exception as e:
+                self._respond(503, {"status": "error", "message": str(e)})
         else:
             self._respond(404, {"status": "not_found"})
 
@@ -47,14 +36,30 @@ class HealthHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+_health_server_thread = None
+_health_server_lock = threading.Lock()
 
 def start_health_server(port: int = 8081):
-    """Starts the health server in a daemon thread. Call once at app startup."""
-    def _serve():
-        server = HTTPServer(("0.0.0.0", port), HealthHandler)
-        logger.info("Health server started", extra={"port": port})
-        server.serve_forever()
+    global _health_server_thread
+    with _health_server_lock:
+        if _health_server_thread is not None and _health_server_thread.is_alive():
+            return _health_server_thread
 
-    thread = threading.Thread(target=_serve, daemon=True)
-    thread.start()
-    return thread
+        def _serve():
+            try:
+                # Inisialisasi tanpa otomatis binding
+                server = HTTPServer(("0.0.0.0", port), HealthHandler, bind_and_activate=False)
+                server.allow_reuse_address = True  # <-- INI KUNCI PENYELAMATNYA!
+                server.server_bind()
+                server.server_activate()
+                logger.info("Health server started successfully", extra={"port": port})
+                server.serve_forever()
+            except OSError as e:
+                if e.errno == 98:
+                    logger.warning("Port 8081 already in use, skipping creation.", extra={"port": port})
+                else:
+                    raise e
+
+        _health_server_thread = threading.Thread(target=_serve, daemon=True)
+        _health_server_thread.start()
+        return _health_server_thread
