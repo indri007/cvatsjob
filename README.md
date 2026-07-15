@@ -1,153 +1,180 @@
-# 🎯 JobMatch AI — CV Review & Job Recommendation App
+# Creative Alibi v2.0 - The "Proof of Human Effort" Protocol
 
-AI-powered web application untuk membantu pencarian kerja di Indonesia. Upload CV kamu dan dapatkan rekomendasi lowongan, review CV, konsultasi karir, dan mock interview — semua berbasis AI.
+---
 
-Project ini dikembangkan untuk Final Project **JCAI (Job Connector AI Engineering) — Purwadhika Digital Technology School**.
+# 🇬🇧 English
 
-## 🌐 Live Demo
+**Creative Alibi** is a Microsoft Word Add-in that acts as a digital notary, recording the process of writing to mathematically prove that the text was created by a human. It provides defense against false accusations from faulty AI detectors.
 
-**[https://job-search-app-994794168239.asia-southeast2.run.app](https://job-search-app-994794168239.asia-southeast2.run.app)**
+Built for the **AI Builders Challenge** — theme "Reimagine Creative Industries with AI".
 
-## ✨ Fitur
+### Architecture (Multi-Layer Forensics)
+1. **Layer 1: Behavioral Engine (Offline)** — Analyzes keystroke rhythms, editing bursts, and pauses.
+2. **Layer 2: Linguistic Engine (Offline)** — Analyzes lexical diversity using Zipf's Law and Hapax Legomena.
+3. **Layer 3: External API Verification (Consent-based)** — Integrates with powerful AI models like **IBM watsonx.ai (Granite)**, GPTZero, ZeroGPT, and Desklib through a secured proxy server on Cloud Run.
+4. **Layer 4: Blockchain Timestamping** — Bitcoin-anchored proof via OpenTimestamps.
 
-- 🔐 **Login Google** — Autentikasi via Google OAuth sebelum mengakses aplikasi
-- 📄 **Upload CV** — Mendukung format PDF & Word, maksimal 100MB
-- 💼 **Rekomendasi Lowongan** — AI mencocokkan CV dengan database lowongan kerja Indonesia via Qdrant Vector Search (semantic search)
-- 🔍 **Cari Lowongan Real-time** — Scraping langsung dari JobStreet (Selenium) untuk pencarian manual
-- ✍️ **Review CV** — Analisis ATS score, feedback, dan generate CV versi ATS-friendly
-- 💬 **Konsultasi Karir** — Chat dengan AI career consultant berbasis Gemini
-- 🎤 **Mock Interview** — Simulasi wawancara kerja dengan AI interviewer (text & voice)
-- 🔄 **Auto-fetch Lowongan Harian** — Cloud Scheduler menjalankan pengambilan 5 lowongan baru setiap hari dari JSearch API (RapidAPI), merotasi 10 kategori pekerjaan teratas
-- 📊 **Observability** — Structured logging (Cloud Logging), health checks, error tracking (Sentry)
+### Why IBM watsonx.ai?
+For the IBM AI Builders Challenge, we leverage **IBM watsonx.ai** and its Granite foundation models. By analyzing linguistic patterns through Granite models, we get an enterprise-grade forensic classification to complement our local offline layers.
 
-## 🛠️ Tech Stack
-
-| Layer | Teknologi |
-|---|---|
-| Frontend | Streamlit |
-| Autentikasi | Google OAuth 2.0 |
-| AI/LLM | Google Gemini 2.5 Flash (utama), OpenAI (fallback embedding) |
-| Vector Store | Qdrant Cloud (semantic search) |
-| Database | Aiven MySQL (SQLAlchemy) |
-| Job Data (real-time) | Selenium + BeautifulSoup (JobStreet scraper) |
-| Job Data (otomatis harian) | JSearch API via RapidAPI |
-| Scheduler | Google Cloud Scheduler |
-| Deployment | Google Cloud Run (service + job), asia-southeast2 |
-| Observability | Sentry, structured JSON logging, Cloud Run health checks |
-
-## 🏗️ Arsitektur
-
-```
-┌─────────────────┐      ┌──────────────────┐      ┌─────────────┐
-│  Cloud Scheduler │ ───▶ │  Cloud Run Job    │ ───▶ │  JSearch    │
-│  (jam 9 pagi WIB)│      │  daily-job-fetch  │      │  API        │
-└─────────────────┘      └─────────┬─────────┘      └─────────────┘
-                                    │
-                                    ▼
-                      ┌─────────────────────────┐
-                      │   Aiven MySQL (SQL)      │
-                      │   Qdrant Cloud (Vector)  │
-                      └────────────┬─────────────┘
-                                    │
-                                    ▼
-                      ┌─────────────────────────┐
-                      │  Cloud Run Service        │
-                      │  job-search-app (Streamlit)│
-                      │  ← Google OAuth Login      │
-                      └─────────────────────────┘
-```
-
-## 🚀 Deployment
-
-Aplikasi terdiri dari dua komponen Cloud Run:
-
-**1. Service utama (Streamlit UI)**
-```
-Service: job-search-app
-Region:  asia-southeast2 (Jakarta)
-URL:     https://job-search-app-994794168239.asia-southeast2.run.app
-```
-
-**2. Cloud Run Job (auto-fetch harian)**
-```
-Job:       daily-job-fetch
-Region:    asia-southeast2
-Trigger:   Cloud Scheduler, cron "0 9 * * *" (Asia/Jakarta)
-```
-
-Deploy ulang service utama:
+### Quick Setup
 ```bash
-gcloud run deploy job-search-app \
-  --source . \
-  --region=asia-southeast2 \
-  --project=heaven-493814
+npm install
+npm run server      # backend proxy on localhost:3001
+npm run dev-server   # taskpane dev server
 ```
+> Note: `npm run dev:all` uses a Windows-only `start` command and won't work on macOS/Linux. Run `server` and `dev-server` in two separate terminals instead, or install `concurrently` to combine them.
 
-Deploy ulang Cloud Run Job:
+---
+
+# 🇮🇩 Bahasa Indonesia
+
+**Creative Alibi** adalah Add-in Microsoft Word yang bertindak sebagai notaris digital, merekam proses mengetik untuk membuktikan secara matematis bahwa teks tersebut dibuat oleh manusia murni. Aplikasi ini memberikan perlindungan dari tuduhan palsu *AI detector*.
+
+### Arsitektur (Multi-Layer Forensics)
+1. **Layer 1: Mesin Perilaku (Offline)** — Menganalisis ritme ketikan, lonjakan (*burst*) penyalinan, dan jeda natural.
+2. **Layer 2: Mesin Linguistik (Offline)** — Menganalisis kekayaan kosakata menggunakan Hukum Zipf dan *Hapax Legomena*.
+3. **Layer 3: Verifikasi API Eksternal (Berbasis Persetujuan)** — Terintegrasi dengan model AI canggih seperti **IBM watsonx.ai (Granite)**, GPTZero, ZeroGPT, dan Desklib melalui proxy server yang aman di Cloud Run.
+4. **Layer 4: Blockchain Timestamping** — Bukti timestamp berbasis Bitcoin via OpenTimestamps.
+
+### Kenapa menggunakan IBM watsonx.ai?
+Khusus untuk IBM AI Builders Challenge, kami memanfaatkan **IBM watsonx.ai** dengan model unggulannya, *Granite*. Analisis dari *foundation model* IBM memberikan tingkat klasifikasi forensik standar *enterprise* yang melengkapi algoritma *offline* lokal kami.
+
+### Cara Menjalankan (Lokal)
 ```bash
-gcloud run jobs deploy daily-job-fetch \
-  --source . \
-  --region=asia-southeast2 \
-  --project=heaven-493814 \
-  --command="python3" \
-  --args="daily_fetch.py"
+npm install
+cp server/.env.example server/.env   # isi API key masing-masing provider
+npm run server      # backend proxy di localhost:3001
+npm run dev-server   # taskpane dev server
 ```
 
-## ⚙️ Setup Lokal
+---
 
-1. Clone repository ini
-2. Copy `.env.example` menjadi `.env` dan isi dengan credentials kamu
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Jalankan aplikasi:
-   ```bash
-   streamlit run app.py
-   ```
+## 🔗 Live Demo — Cloud Run
 
-Untuk setup database Aiven MySQL, lihat [`AIVEN_SETUP.md`](./AIVEN_SETUP.md).
+Backend proxy server berjalan di Google Cloud Run:
 
-## 📋 Environment Variables
+**Base URL: `https://ai-alibi-backend-994794168239.asia-southeast2.run.app`**
 
-Di production, semua variabel di bawah disimpan di **Google Secret Manager** (bukan file `.env`). Untuk development lokal, lihat `.env.example`.
-
-| Variabel | Keterangan |
+| Resource | URL |
 |---|---|
-| `GEMINI_API_KEY` | Google Gemini API Key (LLM utama + embedding) |
-| `OPENAI_API_KEY` | OpenAI API Key (fallback embedding jika Gemini quota habis) |
-| `DATABASE_URL` | Aiven MySQL connection string |
-| `QDRANT_URL` / `QDRANT_API_KEY` | Qdrant Cloud credentials |
-| `VECTOR_STORE` | `qdrant` atau `chromadb` |
-| `EMBEDDING_MODEL` | Model embedding yang dipakai |
-| `AUTH_REDIRECT_URI` / `AUTH_COOKIE_SECRET` | Konfigurasi Google OAuth login |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Kredensial OAuth dari Google Cloud Console |
-| `RAPIDAPI_KEY` / `RAPIDAPI_KEY_BACKUP` | Key JSearch API untuk auto-fetch lowongan harian |
-| `SENTRY_DSN` | Error tracking (opsional) |
-| `ENVIRONMENT` | `production` / `development` |
+| Health check | [`/health`](https://ai-alibi-backend-994794168239.asia-southeast2.run.app/health) |
+| Manifest add-in | [`/manifest.xml`](https://ai-alibi-backend-994794168239.asia-southeast2.run.app/manifest.xml) |
+| Taskpane UI | [`/taskpane.html`](https://ai-alibi-backend-994794168239.asia-southeast2.run.app/taskpane.html) |
 
-## 📁 Struktur Project
+Detector model lokal (Desklib) berjalan sebagai service terpisah:
 
+| Service | URL |
+|---|---|
+| **desklib-detector** | https://desklib-detector-994794168239.asia-southeast2.run.app |
+
+---
+
+## 📖 Tutorial Penggunaan
+
+### 1. 🚀 Akses API Cloud Run
+
+| Endpoint | Method | Auth | Deskripsi |
+|----------|--------|------|-----------|
+| `/health` | GET | — | Cek status server, provider aktif, dan kesehatan dependency (Desklib, GCS) |
+| `/api/detect` | POST | X-API-Key | Deteksi apakah teks buatan AI |
+| `/api/support` | POST | — | Chat dengan support AI |
+| `/api/license/request` | POST | — | Ajukan permintaan akses lisensi |
+| `/api/admin/*` | GET/POST | Admin Password | Kelola lisensi (dashboard admin) |
+
+### 2. 🔬 Deteksi Teks AI
+**Request:**
+```bash
+curl -X POST https://ai-alibi-backend-994794168239.asia-southeast2.run.app/api/detect \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: <api-key-kamu>" \
+  -d '{"provider":"desklib","text":"Teks yang ingin diperiksa (minimum 50 karakter)..."}'
 ```
-├── app.py                  # Entry point Streamlit — auth, routing, dispatch
-├── pages/                  # Modul UI per step wizard (A–E)
-├── config.py                # Konfigurasi terpusat (env vars, clients)
-├── database.py               # SQLAlchemy models & query (Aiven MySQL)
-├── vector_store.py            # Qdrant/ChromaDB manager + embedding (Gemini/OpenAI)
-├── scraper.py                # Scraper JobStreet real-time (Selenium)
-├── jsearch_client.py          # Client JSearch API (auto-fetch harian)
-├── daily_fetch.py             # Entry point Cloud Run Job harian
-├── cv_processor.py            # Ekstraksi teks CV (PDF/Word)
-├── auth_setup.py              # Google OAuth login
-├── logger.py / metrics.py     # Structured logging & metrics
-├── health_check.py / health_server.py  # Health check endpoint
-└── rule/                      # Dokumen requirement resmi dari tutor
+
+**Status provider saat ini:**
+| Provider | Status | Keterangan |
+|----------|--------|------------|
+| `desklib` | ✅ Aktif | Model lokal DeBERTa-v3 (self-hosted di Cloud Run) |
+| `zerogpt` | ⚠️ Key terpasang, akses API masih ditolak (403) | Menunggu konfirmasi dari support ZeroGPT |
+| `watsonx` | ⚠️ Key tidak valid | Perlu akun IBM Cloud baru |
+| `gptzero` | ⬜ Belum dikonfigurasi | Butuh API key dari gptzero.me |
+| `hix` | ⬜ Belum dikonfigurasi | Butuh kredensial HIX premium |
+
+### 3. 💬 Support Chat
+```bash
+curl -X POST https://ai-alibi-backend-994794168239.asia-southeast2.run.app/api/support \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Halo, bagaimana cara kerja Creative Alibi?"}'
 ```
 
-## ⚠️ Known Issues
+### 4. 📝 Integrasi Microsoft Word
+1. Clone repo: `git clone https://github.com/indri007/ai-alibi.git`
+2. Buka Word → **Insert** → **Get Add-ins** → **Upload My Add-in**
+3. Masukkan URL manifest: `https://ai-alibi-backend-994794168239.asia-southeast2.run.app/manifest.xml`
+4. Tab **Creative Alibi** akan muncul di ribbon, sudah terhubung otomatis ke Cloud Run
 
-- Google OAuth login: sedang dalam perbaikan (`client_secret` perlu di-refresh secara berkala di Google Cloud Console).
+### 5. 🔑 Sistem Lisensi
+Creative Alibi menggunakan alur persetujuan akses berbasis email:
+1. Pengguna mengajukan permintaan akses lewat form
+2. Admin menerima email approval dengan tombol **Setujui**/**Tolak**
+3. Setelah disetujui, kode lisensi otomatis dikirim ke email pemohon
+4. Kode lisensi dimasukkan di halaman aktivasi add-in
 
-## 📚 Referensi Requirement
+Admin juga bisa generate lisensi manual lewat CLI:
+```bash
+node server/scripts/generate-license.js 365 "nama pembeli"
+```
 
-Requirement resmi final project dari tutor tersedia di folder [`rule/`](./rule/).
+### 6. 🛠️ Fitur Utama
+- ✅ **Keystroke Forensics** — Rekam kebiasaan mengetik
+- ✅ **Linguistic Analysis** — Analisis gaya bahasa (Zipf's Law)
+- ✅ **Multi-Provider Detection** — Desklib, ZeroGPT, watsonx, GPTZero, HIX
+- ✅ **Real-time Tracking** — Pantau proses menulis langsung
+- ✅ **Digital Certificate** — Bukti otentik tulisan manusia
+- ✅ **Blockchain Timestamping** — OpenTimestamps (Bitcoin-anchored)
+- ✅ **Support Chat AI** — Tanya jawab langsung
+- ✅ **Sistem Lisensi** — Approval akses berbasis email
+
+### 7. 🏗️ Struktur Project
+```
+server/
+├── index.js               # Entry point utama
+├── config/env.js          # Validasi environment variable saat startup
+├── utils/logger.js        # Logging terstruktur
+├── routes/                 # Route per-domain
+│   ├── auth.js             # Google OAuth
+│   ├── detect.js           # Endpoint deteksi AI
+│   ├── support.js          # Support chat
+│   └── admin.js             # Manajemen lisensi (rate-limited)
+├── middleware/
+│   └── errorHandler.js      # Error handler terpusat
+├── lib/
+│   ├── licenses.js          # Logic lisensi (GCS-backed)
+│   ├── mailer.js            # Kirim email approval via Gmail
+│   └── healthChecks.js       # Deep health check (Desklib, GCS)
+├── providers/                # Handler tiap AI detector
+│   ├── desklib.js
+│   ├── gptzero.js
+│   ├── zerogpt.js
+│   ├── watsonx.js
+│   └── hix.js
+├── scripts/
+│   └── generate-license.js   # CLI generate lisensi manual
+└── public/                    # Static assets (taskpane, admin dashboard)
+```
+
+### 8. 🐳 Deploy Sendiri (Cloud Run)
+```bash
+gcloud run deploy ai-alibi-backend \
+  --source . \
+  --region asia-southeast2 \
+  --allow-unauthenticated
+```
+
+Environment variable & secret dikelola lewat Google Secret Manager — lihat `server/.env.example` untuk daftar lengkap variable yang dibutuhkan (`ZEROGPT_API_KEY`, `WATSONX_API_KEY`, `WATSONX_PROJECT_ID`, `GMAIL_APP_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `API_KEY`, dll).
+
+---
+
+## 👥 Tim
+
+Dibangun oleh tim 5 orang lintas disiplin (AI, Industrial, Electrical Engineering) untuk AI Builders Challenge.
