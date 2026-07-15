@@ -195,6 +195,25 @@ def export_cv_to_docx(cv_text: str) -> bytes:
         elif line.upper() == line and len(line) > 3 and not line.startswith("-"):
             clean = line.replace("**", "")
             p = doc.add_heading(clean, level=2)
+        elif line == "---":
+            # Garis horizontal ASLI (border paragraf), bukan teks "---" mentah
+            p = doc.add_paragraph()
+            p.paragraph_format.space_before = Pt(2)
+            p.paragraph_format.space_after = Pt(8)
+            try:
+                from docx.oxml import OxmlElement
+                from docx.oxml.ns import qn
+                pPr = p._p.get_or_add_pPr()
+                pBdr = OxmlElement("w:pBdr")
+                bottom = OxmlElement("w:bottom")
+                bottom.set(qn("w:val"), "single")
+                bottom.set(qn("w:sz"), "8")
+                bottom.set(qn("w:space"), "1")
+                bottom.set(qn("w:color"), "CCCCCC")
+                pBdr.append(bottom)
+                pPr.append(pBdr)
+            except Exception:
+                pass  # kalau gagal, cukup paragraf kosong - tidak menampilkan "---" mentah
         elif line.startswith("- ") or line.startswith("• "):
             clean = line.lstrip("-•").strip()
             p = doc.add_paragraph(style="List Bullet")
