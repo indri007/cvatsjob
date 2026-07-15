@@ -9,4 +9,10 @@ flowchart LR
     Execute_a_SQL_query_in_MySQL["Execute a SQL query in MySQL<br/><i>mySqlTool</i>"]
     OpenAI_Chat_Model["OpenAI Chat Model<br/><i>lmChatOpenAi</i>"]
     Webhook --> AI_Agent
+    Vector_Store_Tool -.tool.-> AI_Agent
+    Qdrant_Vector_Store -.vectorStore.-> Vector_Store_Tool
+    Cohere_Embeddings -.embedding.-> Qdrant_Vector_Store
+    Execute_a_SQL_query_in_MySQL -.tool.-> AI_Agent
+    OpenAI_Chat_Model -.languageModel.-> AI_Agent
+    OpenAI_Chat_Model -.languageModel.-> Vector_Store_Tool
 ```
