@@ -294,7 +294,6 @@ def export_cv_to_pdf(cv_text: str) -> bytes:
             elements.append(Paragraph(clean, heading_style))
         elif line.startswith("- ") or line.startswith("• "):
             clean = safe_line.lstrip("-•").strip()
-            clean = re.sub(r'\*\frac{.*?}{.*?}', r'', clean)  # remove math symbols if any
             clean = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', clean)
             elements.append(Paragraph(f"• {clean}", bullet_style))
         else:
