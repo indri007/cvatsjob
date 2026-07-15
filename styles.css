@@ -825,3 +825,21 @@ div[data-testid="stVerticalBlock"]:has(div.cs-widget-marker),
 div[data-testid="stVerticalBlockBorderWrapper"]:has(div.cs-widget-marker) {
     bottom: 160px !important;
 }
+/* ═══════════════════════════════════════════════════════════
+   Override — Palet Merah-Kuning-Biru
+   ═══════════════════════════════════════════════════════════ */
+:root {
+    --accent-blue: #1E5AA8;
+    --accent-blue-rgb: 30, 90, 168;
+    --accent-blue-hover: #143E77;
+    --accent-amber: #F2B705;
+    --accent-rose: #D64545;
+    --gradient-primary: linear-gradient(135deg, #1E5AA8, #143E77);
+    --gradient-warm: linear-gradient(135deg, #F2B705, #D64545);
+}
+
+h1, h2, h3 {
+    border-bottom: 3px solid var(--accent-amber);
+    padding-bottom: 0.3rem;
+    display: inline-block;
+}
