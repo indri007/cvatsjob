@@ -87,3 +87,24 @@ def is_n8n_configured() -> bool:
 def ensure_data_dir():
     """Create data directory if it doesn't exist."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+
+_RULE_FILE = Path(__file__).parent / "rule" / "Features.txt"
+_rule_cache = None
+
+
+def get_app_scope_rules() -> str:
+    """
+    Baca rule/Features.txt saat runtime (cache in-memory sekali baca per
+    proses). Dipakai agent-agent AI supaya guardrail scope-nya selalu
+    sinkron dengan dokumen requirement resmi, bukan hardcode manual.
+    Return string kosong kalau file tidak ditemukan (fail-safe).
+    """
+    global _rule_cache
+    if _rule_cache is not None:
+        return _rule_cache
+    try:
+        _rule_cache = _RULE_FILE.read_text(encoding="utf-8").strip()
+    except FileNotFoundError:
+        _rule_cache = ""
+    return _rule_cache
